@@ -25,12 +25,24 @@ def query_text(query):
     buttonCancel = types.InlineKeyboardButton(text='Відмінити', callback_data='cancel')
     keybroad.add(buttonAccept, buttonCancel)
     results = []
-    msg = types.InlineQueryResultArticle(
-        id='1', title='Buttons',
+    msgLend = types.InlineQueryResultArticle(
+        id='1', title='Дати в борг',
         input_message_content=types.InputTextMessageContent(message_text=message),
         reply_markup=keybroad
     )
-    results.append(msg)
+    msgBorrow=types.InlineQueryResultArticle(
+        id='2', title='Отримати в борг',
+        input_message_content=types.InputTextMessageContent(message_text=message),
+        reply_markup=keybroad
+    )
+    msgReturn=types.InlineQueryResultArticle(
+        id='3', title='Повернути борг',
+        input_message_content=types.InputTextMessageContent(message_text=message),
+        reply_markup=keybroad
+    )
+    results.append(msgLend)
+    results.append(msgReturn)
+    results.append(msgBorrow)
     bot.answer_inline_query(query.id, results)
 
 
