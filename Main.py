@@ -6,7 +6,7 @@ from telebot import types
 
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
-message = 'Some text'
+message = 'Some text '
 
 
 @bot.message_handler(content_types=['text'])
@@ -20,6 +20,9 @@ def query_text(query):
         matches = re.match(digits_pattern, query.query)
     except AttributeError as ex:
         return
+
+
+    num = matches.group()
     keybroad = types.InlineKeyboardMarkup()
     buttonAccept = types.InlineKeyboardButton(text='Прийняти', callback_data='accept')
     buttonCancel = types.InlineKeyboardButton(text='Відмінити', callback_data='cancel')
@@ -27,7 +30,7 @@ def query_text(query):
     results = []
     msgLend = types.InlineQueryResultArticle(
         id='1', title='Дати в борг',
-        input_message_content=types.InputTextMessageContent(message_text=message),
+        input_message_content=types.InputTextMessageContent(message_text=message + num),
         reply_markup=keybroad
     )
     msgBorrow=types.InlineQueryResultArticle(
@@ -40,6 +43,7 @@ def query_text(query):
         input_message_content=types.InputTextMessageContent(message_text=message),
         reply_markup=keybroad
     )
+
     results.append(msgLend)
     results.append(msgReturn)
     results.append(msgBorrow)
