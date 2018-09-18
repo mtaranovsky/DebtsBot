@@ -41,6 +41,7 @@ def query_text(query):
         input_message_content=types.InputTextMessageContent(message_text='Повернено борг в сумі '+num+' грн.'),
         reply_markup=keybroad
     )
+
     results.append(msgLend)
     results.append(msgReturn)
     results.append(msgBorrow)
