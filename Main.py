@@ -1,11 +1,11 @@
 import config
-# import db
+import db
 import telebot
 import re
 from telebot import types
 
-# print(db.x.inserted_id)
-# print(db.mydict)
+print(db.x.inserted_id)
+print(db.mydict)
 
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
@@ -18,6 +18,7 @@ def repeat_all_messages(message):  # Название функции не игр
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
 def query_text(query):
+    global num
     try:
         matches = re.match(digits_pattern, query.query)
     except AttributeError as ex:
@@ -53,19 +54,26 @@ def query_text(query):
     results.append(msgReturn)
     results.append(msgBorrow)
 
+
     bot.answer_inline_query(query.id, results)
 
 
-# @bot.chosen_inline_handlers(func=lambda chosen_inline_result: True)
-# def chosen_msg(chosen_inline_result):
+
 @bot.chosen_inline_handler(func=lambda chosen_inline_result: True)
 def chosen_msg(chosen_inline_result):
-    if chosen_inline_result.result_id == '1':
-        print("1111111111111")
+    global num1, username
+    username=chosen_inline_result.query.from_user.username
+    if chosen_inline_result.result_id == '1' or '3':
+
+        print("111")
+        num1=num
+        # db.request(str(chosen_inline_result.query.from_user.username),,-num)
     if chosen_inline_result.result_id == '2':
         print("2222222222222")
-    if chosen_inline_result.result_id == '3':
-        print("3333333333333")
+        num1 = -num
+    # if chosen_inline_result.result_id == '3':
+    #     print("3333333333333")
+
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -74,11 +82,14 @@ def callback_inline(call):
         if call.data == "accept":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
                                   text='\nПрийнято \n@' + call.from_user.username)
+            db.request(username,call.from_user.username,num1)
     if call.inline_message_id:
         if call.data == "cancel":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
                                   text='\nВідхилено \n@' + call.from_user.username)
     # print(bot.get_chat_member(call.chat_id))
+
+
 
 
 if __name__ == '__main__':
