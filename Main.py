@@ -4,8 +4,8 @@ import telebot
 import re
 from telebot import types
 
-print(db.x.inserted_id)
-print(db.mydict)
+# print(db.x.inserted_id)
+# print(db.mydict)
 
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
