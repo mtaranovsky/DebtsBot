@@ -23,59 +23,61 @@ mycol = mydb["Users"]
 # #  = mycol.find(myquery)
 # mydoc = mycol.update_one(myquery, newvalues)
 #
-testsum=mycol.find_one({'username':'Vasyl','debts.partner':'Kolya'},{'_id':0,'debts.debt':1,'debts.partner':1})
-print(testsum)
-sumo=70
-if testsum==None:
-    mydict = {"partner": "Kolya", "debt": sumo, 'data': datetime.datetime.now()}
-    debts.append(mydict)
-    users = {'username': 'Vasyl', 'debts': debts}
-    x = mycol.insert_one(users)
-else:
-    array=dict(testsum)
-    asd = array['debts']
-    print(asd)
-    for i in asd:
-        if i['partner']=='Andrew':
-            print(i['debt'])
-            sumo=i['debt']
-# print(type(list[2]))
 
-# mycol.update_one(
-#   {
-#     "debts.debt": 50
-#   },
-#   {
-#     "$set" : { "debts.$.debt": 800 }
-#   }
-# )
-mycol.update_one(
-      {
-        'username':'Vasyl','debts.partner':'Kolya'
-      },
-      {
-        "$set" : { "debts.$.debt": sumo+5,'debts.$.data':datetime.datetime.now()}})
 
-for x in mycol.find():
-  print(x)
+
+
+
+#
+# sumo=70
+
 #
 #
 
 #
 def request(username,partner,sum):
-  testsum = mycol.find_one({'username': username, 'debts.partner': partner},{'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-  array = dict(testsum)
-  asd = array['debts']
-  for i in asd:
-    if i['partner'] == partner:
-      print(i['debt'])
-      sumo = i['debt']
-  mycol.update_one(
-      {
-        'username':username,'debts.$.partner':partner
-      },
-      {
-        "$set" : { "debts.$.debt": sumo+sum,'data':datetime.datetime.now()}})
+    mydict = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
+    users = {'username': username, 'debts': debts}
+
+    testsum = mycol.find_one({'username': username, 'debts.partner': partner},
+                             {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+    testsum2 = mycol.find_one({'username': username}, {'_id': 0, 'username': 1})
+    testsum3 = mycol.find_one({'username': username}, {'_id': 0, 'debts': 1})
+    if testsum2 == None:
+        debts.append(mydict)
+        x = mycol.insert_one(users)
+    elif testsum == None:
+
+        array = dict(testsum3)
+        asd = array['debts']
+        asd.append(mydict)
+        mycol.update_one(
+            {
+                'username': username
+                # ,               'debts.partner':'Petro'
+            },
+            {
+                "$set": {"debts": asd}})
+
+
+    else:
+        array = dict(testsum)
+        asd = array['debts']
+        # print(asd)
+        for i in asd:
+            if i['partner'] == partner:
+                # print(i['debt'])
+                sumo = i['debt']
+
+    mycol.update_one(
+        {
+            'username': username, 'debts.partner': partner
+        },
+        {
+            "$set": {"debts.$.debt": sumo + sum, 'debts.$.data': datetime.datetime.now()}})
+    #
+    for x in mycol.find():
+        print(x)
 
 
 
