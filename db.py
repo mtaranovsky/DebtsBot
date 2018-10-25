@@ -6,7 +6,10 @@ debtsU=[]
 debtsP=[]
 mycol = mydb["Users"]
 
+
 def request(username,partner,sum):
+    sumoP=0
+    sumoU=0
     mydictUser = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
     mydictP = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
     usersU = {'username': username, 'debts': debtsU}
@@ -48,7 +51,7 @@ def request(username,partner,sum):
                 sumoU = i['debt']
 
         for i in dict(getDebtP)['debts']:
-            if i['partner'] == partner:
+            if i['partner'] == username:
                 sumoP = i['debt']
 
     mycol.update_one(
@@ -60,7 +63,7 @@ def request(username,partner,sum):
 
     mycol.update_one(
         {
-            'username': username, 'debts.partner': partner
+            'username': partner, 'debts.partner': username
         },
         {
             "$set": {"debts.$.debt": sumoP + sum, 'debts.$.data': datetime.datetime.now()}})
