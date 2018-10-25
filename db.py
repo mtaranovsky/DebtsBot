@@ -39,34 +39,25 @@ def request(username,partner,sum):
     mydict = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
     users = {'username': username, 'debts': debts}
 
-    testsum = mycol.find_one({'username': username, 'debts.partner': partner},
-                             {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-    testsum2 = mycol.find_one({'username': username}, {'_id': 0, 'username': 1})
-    testsum3 = mycol.find_one({'username': username}, {'_id': 0, 'debts': 1})
-    if testsum2 == None:
+    getDebt = mycol.find_one({'username': username, 'debts.partner': partner}, {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+
+    if mycol.find_one({'username': username}, {'_id': 0, 'username': 1}) == None:
         debts.append(mydict)
         x = mycol.insert_one(users)
-    elif testsum == None:
-
-        array = dict(testsum3)
+    elif getDebt == None:
+        array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
         asd = array['debts']
         asd.append(mydict)
         mycol.update_one(
             {
                 'username': username
-                # ,               'debts.partner':'Petro'
             },
             {
                 "$set": {"debts": asd}})
 
-
     else:
-        array = dict(testsum)
-        asd = array['debts']
-        # print(asd)
-        for i in asd:
+        for i in dict(getDebt)['debts']:
             if i['partner'] == partner:
-                # print(i['debt'])
                 sumo = i['debt']
 
     mycol.update_one(
@@ -78,6 +69,21 @@ def request(username,partner,sum):
     #
     for x in mycol.find():
         print(x)
+
+
+
+def feedback(username,partner):
+    getDebt = mycol.find_one({'username': username, 'debts.partner': partner},
+                             {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+    for i in dict(getDebt)['debts']:
+        if i['partner'] == partner:
+            sumo = i['debt']
+
+    return sumo
+
+
+
+
 
 
 
