@@ -23,11 +23,11 @@ mycol = mydb["Users"]
 # #  = mycol.find(myquery)
 # mydoc = mycol.update_one(myquery, newvalues)
 #
-testsum=mycol.find_one({'username':'Vasyl','debts.partner':'Andrew'},{'_id':0,'debts.debt':1,'debts.partner':1})
+testsum=mycol.find_one({'username':'Vasyl','debts.partner':'Kolya'},{'_id':0,'debts.debt':1,'debts.partner':1})
 print(testsum)
 sumo=70
 if testsum==None:
-    mydict = {"partner": "Andrew", "debt": sumo, 'data': datetime.datetime.now()}
+    mydict = {"partner": "Kolya", "debt": sumo, 'data': datetime.datetime.now()}
     debts.append(mydict)
     users = {'username': 'Vasyl', 'debts': debts}
     x = mycol.insert_one(users)
@@ -51,10 +51,10 @@ else:
 # )
 mycol.update_one(
       {
-        'username':'Vasyl','debts.partner':'Andrew'
+        'username':'Vasyl','debts.partner':'Kolya'
       },
       {
-        "$set" : { "debts.$.debt": sumo+5,'data':datetime.datetime.now()}})
+        "$set" : { "debts.$.debt": sumo+5,'debts.$.data':datetime.datetime.now()}})
 
 for x in mycol.find():
   print(x)
