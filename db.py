@@ -4,37 +4,7 @@ myclient = pymongo.MongoClient("mongodb://mtaranovsky:963852741t@ds125693.mlab.c
 mydb = myclient["debtsbot"]
 debts=[]
 mycol = mydb["Users"]
-# mydict = {"partner": "Andrew","debt": 70, 'data':datetime.datetime.now()}
-# mydict1 = {"partner": "Petro","debt": 520, 'data':datetime.datetime.now()}
-# mydict2 = {"partner": "Ivan","debt": 50, 'data':datetime.datetime.now()}
-#
-# debts.append(mydict)
-# debts.append(mydict1)
-# debts.append(mydict2)
-# debts.append(mydict3)
-# debts.append(mydict4)
-# users = {'username': 'Kolya', 'debts': debts}
-#
-# x = mycol.insert_one(users)
-# myquery = { "debt.debts.debt": 50 }
-# newvalues = { "$set": {"debt.debts.debt": 800}}
-# # myquery = {"debts.debt": 50}
-# #
-# #  = mycol.find(myquery)
-# mydoc = mycol.update_one(myquery, newvalues)
-#
 
-
-
-
-
-#
-# sumo=70
-
-#
-#
-
-#
 def request(username,partner,sum):
     mydict = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
     users = {'username': username, 'debts': debts}
