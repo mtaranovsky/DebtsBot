@@ -66,7 +66,7 @@ def request(username,partner,sum):
             'username': partner, 'debts.partner': username
         },
         {
-            "$set": {"debts.$.debt": sumoP + sum, 'debts.$.data': datetime.datetime.now()}})
+            "$set": {"debts.$.debt": sumoP - sum, 'debts.$.data': datetime.datetime.now()}})
     #
     for x in mycol.find():
         print(x)

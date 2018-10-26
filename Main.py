@@ -64,7 +64,7 @@ def query_text(query):
 def chosen_msg(chosen_inline_result):
     global num1, user_name
     user_name = chosen_inline_result.from_user.username
-    print(user_name)
+    print(user_name+'\n')
     if chosen_inline_result.result_id == '1' or chosen_inline_result.result_id == '3':
         num1 = int(chosen_inline_result.query)
     elif chosen_inline_result.result_id == '2':
@@ -77,7 +77,7 @@ def callback_inline(call):
         if call.data == "accept":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
                                   text='\nПрийнято \n@' + call.from_user.username)
-            #db.request(username,call.from_user.username,num1)
+            db.request(user_name,call.from_user.username,num1)
             print(user_name)
             print(call.from_user.username + '\n')
     if call.inline_message_id:
