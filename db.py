@@ -73,8 +73,8 @@ def request(username,partner,sum):
 
 
 
-def feedback(username,partner):
-    getDebt = mycol.find_one({'username': username, 'debts.partner': partner},
+def feedback(username):
+    getDebt = mycol.find_one({'username': username},
                              {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
     for i in dict(getDebt)['debts']:
         if i['partner'] == partner:

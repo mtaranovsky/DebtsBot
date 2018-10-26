@@ -15,11 +15,6 @@ def repeat_all_messages(message):  # Название функции не игр
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
 def query_text(query):
-
-
-
-
-    # global num
     try:
         matches = re.match(digits_pattern, query.query)
     except AttributeError as ex:
@@ -30,9 +25,6 @@ def query_text(query):
     buttonCancel = types.InlineKeyboardButton(text='Відмінити', callback_data='cancel')
     keybroad.add(buttonAccept, buttonCancel)
     results = []
-    # global user_name
-    #
-    # user_name = str(query.from_user.username)
 
     msg_lend = types.InlineQueryResultArticle(
         id='1', title='Дати в борг',
@@ -64,7 +56,9 @@ def query_text(query):
 def chosen_msg(chosen_inline_result):
     global num1, user_name
     user_name = chosen_inline_result.from_user.username
+    print(chosen_inline_result.result_id+'\n')
     print(user_name+'\n')
+
     if chosen_inline_result.result_id == '1' or chosen_inline_result.result_id == '3':
         num1 = int(chosen_inline_result.query)
     elif chosen_inline_result.result_id == '2':
@@ -73,6 +67,7 @@ def chosen_msg(chosen_inline_result):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
+
     if call.inline_message_id:
         if call.data == "accept":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
@@ -86,6 +81,19 @@ def callback_inline(call):
                                   text='\nВідхилено \n@' + call.from_user.username)
 
 
+@bot.inline_handler(func=lambda query: len(query.query) is 0)
+def query_empty(inline_query):
+
+    try:
+        msg_current_debs = types.InlineQueryResultArticle(
+            id='4',
+            title="Переглянути активні борги",
+            input_message_content=types.InputTextMessageContent(
+                message_text=str(db.feedback(inline_query.from_user.username)))
+        )
+        bot.answer_inline_query(inline_query.id, [msg_current_debs])
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':
