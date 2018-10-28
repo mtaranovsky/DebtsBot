@@ -11,9 +11,8 @@ def request(username,partner,sum):
     sumoP=0
     sumoU=0
     mydictUser = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
-    mydictP = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
+    mydictP = {"partner": username, "debt": sum, 'data': datetime.datetime.now()}
     usersU = {'username': username, 'debts': debtsU}
-    mydictP = {"partner": username, "debt": -sum, 'data': datetime.datetime.now()}
     usersP = {'username': partner, 'debts': debtsP}
     getDebtU = mycol.find_one({'username': username, 'debts.partner': partner}, {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
     getDebtP = mycol.find_one({'username': partner, 'debts.partner': username},
@@ -34,16 +33,20 @@ def request(username,partner,sum):
             },
             {
                 "$set": {"debts": asd}})
+        if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) == None:
+            debtsP.append(mydictP)
+            y = mycol.insert_one(usersP)
+        else:
+            array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
 
-        array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
-        asd = array['debts']
-        asd.append(mydictP)
-        mycol.update_one(
-            {
-                'username': partner
-            },
-            {
-                "$set": {"debts": asd}})
+            asd1 = array['debts']
+            asd1.append(mydictP)
+            mycol.update_one(
+                {
+                    'username': partner
+                },
+                {
+                    "$set": {"debts": asd1}})
 
     else:
         for i in dict(getDebtU)['debts']:
@@ -73,14 +76,18 @@ def request(username,partner,sum):
 
 
 
+request("M","A",250)
+
+
+
 def feedback(username):
     getDebt = mycol.find_one({'username': username},
                              {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-    for i in dict(getDebt)['debts']:
-        if i['partner'] == partner:
-            sumo = i['debt']
+    # for i in dict(getDebt)['debts']:
+    #     if i['partner'] == partner:
+    #         sumo = i['debt']
 
-    return sumo
+    return getDebt
 
 
 
