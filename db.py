@@ -2,12 +2,13 @@ import pymongo
 import datetime
 myclient = pymongo.MongoClient("mongodb://mtaranovsky:963852741t@ds125693.mlab.com:25693/debtsbot")
 mydb = myclient["debtsbot"]
-debtsU=[]
-debtsP=[]
+
 mycol = mydb["Users"]
 
 
 def request(username,partner,sum):
+    debtsU = []
+    debtsP = []
     sumoP=0
     sumoU=0
     mydictUser = {"partner": partner, "debt": sum, 'data': datetime.datetime.now()}
@@ -76,19 +77,25 @@ def request(username,partner,sum):
 
 
 
-request("M","A",250)
+# request("M","C",750)
 
 
 
 def feedback(username):
-    getDebt = mycol.find_one({'username': username},
-                             {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-    # for i in dict(getDebt)['debts']:
-    #     if i['partner'] == partner:
-    #         sumo = i['debt']
+    a=0
+    getDebt = mycol.find_one({'username': username}, {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+    a="Твій фінансовий журнал: \n"
 
-    return getDebt
+    for i in dict(getDebt)['debts']:
+        if i["debt"]<0:
 
+            a+="Ти заборгував "+i["partner"]+" "+str(-i["debt"])+"грн.\n"
+        if i["debt"]>=0:
+
+            a+=i["partner"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
+
+    return a
+# print(feedback("M"))
 
 
 
