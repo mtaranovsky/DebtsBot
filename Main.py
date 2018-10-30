@@ -8,9 +8,15 @@ bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
 
 
-@bot.message_handler(content_types=['text'])
-def repeat_all_messages(message):  # Название функции не играет никакой роли, в принципе
-    bot.send_message(message.chat.id, message.text)
+# @bot.message_handler(content_types=['text'])
+# def repeat_all_messages(message):  # Название функции не играет никакой роли, в принципе
+#     bot.send_message(message.chat.id, message.text)
+
+@bot.message_handler(commands= ["myWallet"])
+def send_welcome(message):
+    bot.reply_to(message,db.feedback(message.from_user.username))
+
+
 
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
