@@ -23,7 +23,8 @@ def request(username,partner,sum):
         debtsU.append(mydictUser)
         debtsP.append(mydictP)
         x = mycol.insert_one(usersU)
-        y = mycol.insert_one(usersP)
+        if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) == None:
+            y = mycol.insert_one(usersP)
     elif getDebtU == None:
         array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
         asd = array['debts']
