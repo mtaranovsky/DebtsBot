@@ -89,26 +89,19 @@ def request(username,partner,sum):
         print(x)
 
 
-
-# request("M","C",750)
-
-
-
 def feedback(username):
-    a=0
     getDebt = mycol.find_one({'username': username}, {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
     a="Твій фінансовий журнал: \n"
 
     for i in dict(getDebt)['debts']:
         if i["debt"]<0:
 
-            a+="Ти заборгував "+i["partner"]+" "+str(-i["debt"])+"грн.\n"
-        if i["debt"]>=0:
+            a += "Ти заборгував "+i["partner"]+" "+str(-i["debt"])+"грн.\n"
+        if i["debt" ]>= 0:
 
-            a+=i["partner"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
+            a += i["partner"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
 
     return a
-# print(feedback("M"))
 
 
 
