@@ -25,6 +25,18 @@ def request(username,partner,sum):
         x = mycol.insert_one(usersU)
         if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) == None:
             y = mycol.insert_one(usersP)
+        else:
+            array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
+
+            asd1 = array['debts']
+            asd1.append(mydictP)
+            mycol.update_one(
+                {
+                    'username': partner
+                },
+                {
+                    "$set": {"debts": asd1}})
+
     elif getDebtU == None:
         array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
         asd = array['debts']
