@@ -85,7 +85,7 @@ def callback_inline(call):
 #             id='4',
 #             title="Переглянути активні борги",
 #             input_message_content=telebot.types.InputTextMessageContent(
-#                 message_text=db.feedback(inline_query.from_user.username))
+#                 message_text=db.feedback(inline_query.from_user.usernahfhme))
 #         )
 #         bot.answer_inline_query(inline_query.id, [msg_current_debs])
 #     except Exception as e:
