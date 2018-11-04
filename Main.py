@@ -2,13 +2,13 @@ import config
 import db
 import telebot
 import re
-from telebot import types
+
 
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
 
 
-# @bot.message_handler(content_types=['text'])
+# @bot.message_handler(content_telebot.types=['text'])
 # def repeat_all_messages(message):  # Название функции не играет никакой роли, в принципе
 #     bot.send_message(message.chat.id, message.text)
 
@@ -24,27 +24,27 @@ def query_text(query):
     except AttributeError as ex:
         return
     num = matches.group()
-    keyboard = types.InlineKeyboardMarkup()
-    button_accept = types.InlineKeyboardButton(text='Прийняти', callback_data='accept')
-    button_cancel = types.InlineKeyboardButton(text='Відмінити', callback_data='cancel')
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    button_accept = telebot.types.InlineKeyboardButton(text='Прийняти', callback_data='accept')
+    button_cancel = telebot.types.InlineKeyboardButton(text='Відмінити', callback_data='cancel')
     keyboard.add(button_accept, button_cancel)
     results = []
 
-    msg_lend = types.InlineQueryResultArticle(
+    msg_lend = telebot.types.InlineQueryResultArticle(
         id='1', title='Дати в борг',
-        input_message_content=types.InputTextMessageContent(
+        input_message_content=telebot.types.InputTextMessageContent(
             message_text='Надано в борг ' + num + ' грн.\n' + str(query.from_user.username)),
         reply_markup=keyboard
     )
-    msg_borrow = types.InlineQueryResultArticle(
+    msg_borrow = telebot.types.InlineQueryResultArticle(
         id='2', title='Отримати в борг',
-        input_message_content=types.InputTextMessageContent(
+        input_message_content=telebot.types.InputTextMessageContent(
             message_text='Отримано в борг ' + num + ' грн.\n' + str(query.from_user.username)),
         reply_markup=keyboard
     )
-    msg_return = types.InlineQueryResultArticle(
+    msg_return = telebot.types.InlineQueryResultArticle(
         id='3', title='Повернути борг',
-        input_message_content=types.InputTextMessageContent(
+        input_message_content=telebot.types.InputTextMessageContent(
             message_text='Повернено борг в сумі ' + num + ' грн.\n' + str(query.from_user.username)),
         reply_markup=keyboard
     )
@@ -81,10 +81,10 @@ def callback_inline(call):
 def query_empty(inline_query):
 
     try:
-        msg_current_debs = types.InlineQueryResultArticle(
+        msg_current_debs = telebot.types.InlineQueryResultArticle(
             id='4',
             title="Переглянути активні борги",
-            input_message_content=types.InputTextMessageContent(
+            input_message_content=telebot.types.InputTextMessageContent(
                 message_text=db.feedback(inline_query.from_user.username))
         )
         bot.answer_inline_query(inline_query.id, [msg_current_debs])
