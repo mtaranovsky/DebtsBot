@@ -77,19 +77,19 @@ def callback_inline(call):
         bot.edit_message_text(inline_message_id=call.inline_message_id, text='\nВідхилено \n@' + call.from_user.username)
 
 
-@bot.inline_handler(func=lambda query: len(query.query) is 0)
-def query_empty(inline_query):
-
-    try:
-        msg_current_debs = telebot.types.InlineQueryResultArticle(
-            id='4',
-            title="Переглянути активні борги",
-            input_message_content=telebot.types.InputTextMessageContent(
-                message_text=db.feedback(inline_query.from_user.username))
-        )
-        bot.answer_inline_query(inline_query.id, [msg_current_debs])
-    except Exception as e:
-        print(e)
+# @bot.inline_handler(func=lambda query: len(query.query) is 0)
+# def query_empty(inline_query):
+#
+#     try:
+#         msg_current_debs = telebot.types.InlineQueryResultArticle(
+#             id='4',
+#             title="Переглянути активні борги",
+#             input_message_content=telebot.types.InputTextMessageContent(
+#                 message_text=db.feedback(inline_query.from_user.username))
+#         )
+#         bot.answer_inline_query(inline_query.id, [msg_current_debs])
+#     except Exception as e:
+#         print(e)
 
 
 if __name__ == '__main__':
