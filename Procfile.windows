@@ -1,1 +1,1 @@
-web: python Main.py
+web: python Main.py runserver 0.0.0.0:5000
