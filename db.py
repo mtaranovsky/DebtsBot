@@ -42,12 +42,8 @@ def request(username,partner,sum):
         array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
         asd = array['debts']
         asd.append(mydictUser)
-        mycol.update_one(
-            {
-                'username': username
-            },
-            {
-                "$set": {"debts": asd}})
+        debtUpdate(username,asd)
+
         if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) == None:
             debtsP.append(mydictP)
             y = mycol.insert_one(usersP)
@@ -56,12 +52,7 @@ def request(username,partner,sum):
 
             asd1 = array['debts']
             asd1.append(mydictP)
-            mycol.update_one(
-                {
-                    'username': partner
-                },
-                {
-                    "$set": {"debts": asd1}})
+            debtUpdate(partner,asd1)
 
     else:
         for i in dict(getDebtU)['debts']:
@@ -72,22 +63,29 @@ def request(username,partner,sum):
             if i['partner'] == username:
                 sumoP = i['debt']
 
+    partnerDebtUdate(username,partner,sumoU + sum)
+
+    partnerDebtUdate(partner, username, sumoP - sum)
+
+    #
+    for x in mycol.find():
+        print(x)
+
+def debtUpdate(username, debt):
+    mycol.update_one(
+        {
+            'username': username
+        },
+        {
+            "$set": {"debts": debt}})
+
+def partnerDebtUdate(username, partner,sum):
     mycol.update_one(
         {
             'username': username, 'debts.partner': partner
         },
         {
-            "$set": {"debts.$.debt": sumoU + sum, 'debts.$.data': datetime.datetime.now()}})
-
-    mycol.update_one(
-        {
-            'username': partner, 'debts.partner': username
-        },
-        {
-            "$set": {"debts.$.debt": sumoP - sum, 'debts.$.data': datetime.datetime.now()}})
-    #
-    for x in mycol.find():
-        print(x)
+            "$set": {"debts.$.debt": sum, 'debts.$.data': datetime.datetime.now()}})
 
 
 def feedback(username):
