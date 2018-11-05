@@ -84,6 +84,7 @@ def callback_inline(call):
                               reply_markup=keyboard)
 
 
+
 # @bot.inline_handler(func=lambda query: len(query.query) is 0)
 # def query_empty(inline_query):
 #
