@@ -31,12 +31,8 @@ def request(username,partner,sum):
 
             asd1 = array['debts']
             asd1.append(mydictP)
-            mycol.update_one(
-                {
-                    'username': partner
-                },
-                {
-                    "$set": {"debts": asd1}})
+            debtUpdate(partner, asd1)
+
 
     elif getDebtU == None:
         array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
@@ -55,21 +51,22 @@ def request(username,partner,sum):
             debtUpdate(partner,asd1)
 
     else:
-        for i in dict(getDebtU)['debts']:
-            if i['partner'] == partner:
-                sumoU = i['debt']
-
-        for i in dict(getDebtP)['debts']:
-            if i['partner'] == username:
-                sumoP = i['debt']
+        debtChange(getDebtU,partner,sumoU)
+        debtChange(getDebtP,username,sumoP)
 
     partnerDebtUdate(username,partner,sumoU + sum)
-
     partnerDebtUdate(partner, username, sumoP - sum)
 
     #
     for x in mycol.find():
         print(x)
+
+
+
+def debtChange(Debt,user,sum):
+    for i in dict(Debt)['debts']:
+        if i['partner'] == user:
+            sum = i['debt']
 
 def debtUpdate(username, debt):
     mycol.update_one(
