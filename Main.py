@@ -2,10 +2,17 @@ import config
 import db
 import telebot
 import re
-
+import os
 
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
+version = re.sub('^v', '', os.popen('git describe').read().strip())
+print(version)
+
+
+@bot.message_handler(commands=['v'])
+def send_version(message):
+    bot.send_message(message.chat.id, text=version)
 
 
 @bot.message_handler(commands=['myWallet'])
@@ -82,8 +89,6 @@ def callback_inline(call):
         bot.edit_message_text(inline_message_id=call.inline_message_id,
                               text='Ви не можете прийняти свій же запит',
                               reply_markup=keyboard)
-
-
 
 # @bot.inline_handler(func=lambda query: len(query.query) is 0)
 # def query_empty(inline_query):
