@@ -1,0 +1,5 @@
+[
+  "test_db.py::TestStuff::test_debtUpdate",
+  "test_db.py::TestStuff::test_partnerDebtUdate",
+  "test_db.py::TestStuff::test_save"
+]

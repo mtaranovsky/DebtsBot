@@ -20,7 +20,8 @@ def send_version(message):
 
 @bot.message_handler(commands=['myWallet'])
 def send_wallet(message):
-    bot.reply_to(message, mongo.feedback(message.from_user.username))
+    a = mongo.feedback(message.from_user.username)
+    bot.reply_to(message, a)
 
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
