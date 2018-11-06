@@ -9,14 +9,14 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - pip install pylint
+  - pip install pychecker
 # command to run tests
 script:
  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then python -m unittest discover; fi
 
 after_success:
 
-  - pylint --output-format=html pylint_server > /tmp/pylint-report.html
+  - pychecker
 branches:
   only:
     - master

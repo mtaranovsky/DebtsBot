@@ -6,6 +6,7 @@ import os
 from db import MongoManager
 
 
+
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
 version = re.sub('^v', '', os.popen('git describe').read().strip())
