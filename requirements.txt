@@ -1,2 +1,2 @@
 pytelegrambotapi==3.6.6
-pymongo==3.7.2
+pymongo
