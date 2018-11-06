@@ -41,6 +41,13 @@ class TestStuff(unittest.TestCase):
                                           {'_id': 0, "username": 1, "debts.partner": 1, "debts.debt": 1})
         self.assertDictEqual(result, {'username': 'A', 'debts': [{'partner': 'B', 'debt': 10}]})
 
+    def test_save(self):
+        mongo = MockMongoManager()
+        a = {'a': 123}
+        mongo.save(a, mongo.db_conn)
+        result = mock_collection.find_one({'a': 123}, {'_id': 0})
+        self.assertDictEqual(result, {'a': 123})
+
 
 if __name__ == '__main__':
     unittest.main()
