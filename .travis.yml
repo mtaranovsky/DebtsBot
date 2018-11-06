@@ -9,7 +9,7 @@ install:
 # command to run tests
 script:
  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then python -m unittest discover; fi
- - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then  fi
+
 
 branches:
   only:
