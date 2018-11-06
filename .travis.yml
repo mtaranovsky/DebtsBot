@@ -16,7 +16,7 @@ script:
 
 after_success:
 
-  - pylint
+  - pylint --output-format=html
 branches:
   only:
     - master
