@@ -1,14 +1,16 @@
 import config
-import db
+# import db
 import telebot
 import re
 import os
+from db import MongoManager
+
 
 bot = telebot.TeleBot(config.token)
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
 version = re.sub('^v', '', os.popen('git describe').read().strip())
 print(version)
-
+mongo = MongoManager()
 
 @bot.message_handler(commands=['v'])
 def send_version(message):
@@ -17,7 +19,7 @@ def send_version(message):
 
 @bot.message_handler(commands=['myWallet'])
 def send_wallet(message):
-    bot.reply_to(message, db.feedback(message.from_user.username))
+    bot.reply_to(message, mongo.feedback(message.from_user.username))
 
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
@@ -72,12 +74,11 @@ def chosen_msg(chosen_inline_result):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-
     if call.from_user.username != user_name:
         if call.data == "accept":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
                                   text='\nПрийнято \n@' + call.from_user.username)
-            db.request(user_name, call.from_user.username,num1)
+            mongo.request(user_name, call.from_user.username, num1)
         if call.data == "cancel":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
                                   text='\nВідхилено \n@' + call.from_user.username)
