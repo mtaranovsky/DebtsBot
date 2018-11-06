@@ -1,8 +1,9 @@
-import config
-# import db
-import telebot
+"""Telegram Debts Bot"""
+
 import re
 import os
+import telebot
+import config
 from db import MongoManager
 
 
@@ -13,6 +14,7 @@ version = re.sub('^v', '', os.popen('git describe').read().strip())
 print(version)
 mongo = MongoManager()
 
+
 @bot.message_handler(commands=['v'])
 def send_version(message):
     bot.send_message(message.chat.id, text=version)
@@ -20,7 +22,7 @@ def send_version(message):
 
 @bot.message_handler(commands=['myWallet'])
 def send_wallet(message):
-    bot.reply_to(message, mongo.feedback(message.from_user.username))
+    bot.reply_to(message=message, text=mongo.feedback(message.from_user.username))
 
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
@@ -39,21 +41,18 @@ def query_text(query):
     msg_lend = telebot.types.InlineQueryResultArticle(
         id='1', title='Дати в борг',
         input_message_content=telebot.types.InputTextMessageContent(
-            message_text='Надано в борг ' + num + ' грн.\n' + str(query.from_user.username)),
-        reply_markup=keyboard
-    )
+            message_text='Надано в борг ' + num + ' грн\n' + str(query.from_user.username)),
+        reply_markup=keyboard)
     msg_borrow = telebot.types.InlineQueryResultArticle(
         id='2', title='Отримати в борг',
         input_message_content=telebot.types.InputTextMessageContent(
-            message_text='Отримано в борг ' + num + ' грн.\n' + str(query.from_user.username)),
-        reply_markup=keyboard
-    )
+            message_text='Отримано в борг ' + num + ' грн\n' + str(query.from_user.username)),
+        reply_markup=keyboard)
     msg_return = telebot.types.InlineQueryResultArticle(
         id='3', title='Повернути борг',
         input_message_content=telebot.types.InputTextMessageContent(
-            message_text='Повернено борг в сумі ' + num + ' грн.\n' + str(query.from_user.username)),
-        reply_markup=keyboard
-    )
+            message_text='Повернено борг в сумі ' + num + ' грн\n' + str(query.from_user.username)),
+        reply_markup=keyboard)
 
     results.append(msg_lend)
     results.append(msg_return)
@@ -71,7 +70,6 @@ def chosen_msg(chosen_inline_result):
         num1 = int(chosen_inline_result.query)
     elif chosen_inline_result.result_id == '2':
         num1 = - int(chosen_inline_result.query)
-
 
 
 @bot.callback_query_handler(func=lambda call: True)

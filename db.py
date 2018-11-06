@@ -1,24 +1,28 @@
-import pymongo
 import datetime
+import pymongo
 import config
 myclient = pymongo.MongoClient(config.dbtoken)
 mydb = myclient["debtsbot"]
 
 mycol = mydb["Users"]
 
-class MongoManager:
-    def save(self,a,v):
-        v.insert_one(a)
 
-    def partnerDebtUdate(self,username, partner, sum,col):
+class MongoManager:
+    @classmethod
+    def save(cls, record, col):
+        col.insert_one(record)
+
+    @classmethod
+    def partner_debt_update(cls, username, partner, value, col):
         col.update_one(
             {
                 'username': username, 'debts.partner': partner
             },
             {
-                "$set": {"debts.$.debt": sum, 'debts.$.data': datetime.datetime.now()}})
+                "$set": {"debts.$.debt": value, 'debts.$.data': datetime.datetime.now()}})
 
-    def debtUpdate(self,username, debt,col):
+    @classmethod
+    def debt_update(cls, username, debt, col):
         col.update_one(
             {
                 'username': username
@@ -27,32 +31,33 @@ class MongoManager:
                 "$set": {"debts": debt}})
 
     def request(self, username, partner, summ):
-        debtsU = []
-        debtsP = []
-        sumoP=0
-        sumoU=0
-        mydictUser = {"partner": partner, "debt": summ, 'data': datetime.datetime.now()}
-        mydictP = {"partner": username, "debt": summ, 'data': datetime.datetime.now()}
-        usersU = {'username': username, 'debts': debtsU}
-        usersP = {'username': partner, 'debts': debtsP}
-        getDebtU = mycol.find_one({'username': username, 'debts.partner': partner}, {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-        getDebtP = mycol.find_one({'username': partner, 'debts.partner': username},
-                                  {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+        debts_u = []
+        debts_p = []
+        sumo_p = 0
+        sumo_u = 0
+        dict_user = {"partner": partner, "debt": summ, 'data': datetime.datetime.now()}
+        dict_p = {"partner": username, "debt": summ, 'data': datetime.datetime.now()}
+        users_u = {'username': username, 'debts': debts_u}
+        users_p = {'username': partner, 'debts': debts_p}
+        get_debt_u = mycol.find_one({'username': username, 'debts.partner': partner},
+                                    {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+        get_debt_p = mycol.find_one({'username': partner, 'debts.partner': username},
+                                    {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
 
-        if mycol.find_one({'username': username}, {'_id': 0, 'username': 1}) == None:
-            debtsU.append(mydictUser)
-            debtsP.append(mydictP)
-            # mycol.insert_one(usersU)
-            self.save(usersU,mycol)
-            if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) == None:
-                # mycol.insert_one(usersP)
-                self.save(usersP, mycol)
+        if mycol.find_one({'username': username}, {'_id': 0, 'username': 1}) is None:
+            debts_u.append(dict_user)
+            debts_p.append(dict_p)
+            # mycol.insert_one(users_u)
+            self.save(users_u, mycol)
+            if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) is None:
+                # mycol.insert_one(users_p)
+                self.save(users_p, mycol)
             else:
                 array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
 
                 asd1 = array['debts']
-                asd1.append(mydictP)
-                self.debtUpdate(partner,asd1,mycol)
+                asd1.append(dict_p)
+                self.debt_update(partner, asd1, mycol)
                 # mycol.update_one(
                 #     {
                 #         'username': partner
@@ -60,25 +65,25 @@ class MongoManager:
                 #     {
                 #         "$set": {"debts": asd1}})
 
-        elif getDebtU == None:
+        elif get_debt_u is None:
             array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
             asd = array['debts']
-            asd.append(mydictUser)
+            asd.append(dict_user)
             mycol.update_one(
                 {
                     'username': username
                 },
                 {
                     "$set": {"debts": asd}})
-            if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) == None:
-                debtsP.append(mydictP)
-                # y = mycol.insert_one(usersP)
-                self.save(usersP, mycol)
+            if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) is None:
+                debts_p.append(dict_p)
+                # y = mycol.insert_one(users_p)
+                self.save(users_p, mycol)
             else:
                 array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
 
                 asd1 = array['debts']
-                asd1.append(mydictP)
+                asd1.append(dict_p)
                 mycol.update_one(
                     {
                         'username': partner
@@ -87,22 +92,22 @@ class MongoManager:
                         "$set": {"debts": asd1}})
 
         else:
-            for i in dict(getDebtU)['debts']:
+            for i in dict(get_debt_u)['debts']:
                 if i['partner'] == partner:
-                    sumoU = i['debt']
+                    sumo_u = i['debt']
 
-            for i in dict(getDebtP)['debts']:
+            for i in dict(get_debt_p)['debts']:
                 if i['partner'] == username:
-                    sumoP = i['debt']
+                    sumo_p = i['debt']
 
         # mycol.update_one(
         #     {
         #         'username': username, 'debts.partner': partner
         #     },
         #     {
-        #         "$set": {"debts.$.debt": sumoU + sum, 'debts.$.data': datetime.datetime.now()}})
-        self.partnerDebtUdate(username, partner, sumoU + summ, mycol)
-        self.partnerDebtUdate(partner, username, sumoP - summ, mycol)
+        #         "$set": {"debts.$.debt": sumo_u + sum, 'debts.$.data': datetime.datetime.now()}})
+        self.partner_debt_update(username, partner, sumo_u + summ, mycol)
+        self.partner_debt_update(partner, username, sumo_p - summ, mycol)
         # mycol.update_one(
         #     {
         #         'username': partner, 'debts.partner': username
@@ -110,27 +115,17 @@ class MongoManager:
         #     {
         #         "$set": {"debts.$.debt": sumoP - sum, 'debts.$.data': datetime.datetime.now()}})
         #
-        for x in mycol.find():
-            print(x)
+        for row in mycol.find():
+            print(row)
 
-
-
-
-
-    def feedback(username):
-        getDebt = mycol.find_one({'username': username}, {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-        a="Твій фінансовий журнал: \n"
-
-        for i in dict(getDebt)['debts']:
-            if i["debt"]<0:
-
-                a += "Ти заборгував "+i["partner"]+" "+str(-i["debt"])+"грн.\n"
-            if i["debt" ]>= 0:
-
-                a += i["partner"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
-
-        return a
-
-
-
-
+    @classmethod
+    def feedback(cls, username):
+        get_debt = mycol.find_one({'username': username},
+                                  {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+        result = "Твій фінансовий журнал: \n"
+        for i in dict(get_debt)['debts']:
+            if i["debt"] < 0:
+                result += "Ти заборгував "+i["partner"]+" "+str(-i["debt"])+"грн.\n"
+            if i["debt"] >= 0:
+                result += i["partner"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
+        return result

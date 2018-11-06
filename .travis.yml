@@ -14,7 +14,7 @@ install:
 # command to run tests
 script:
  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then python -m unittest discover; fi
- - pylint Main.py
+ - pylint db.py
 
 branches:
   only:
