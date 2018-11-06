@@ -8,6 +8,7 @@ from db import MongoManager
 mock_collection = mongomock.MongoClient().db.collection
 
 
+
 class MockMongoManager(MongoManager):
 
     def __init__(self):

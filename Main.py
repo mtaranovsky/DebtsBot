@@ -72,6 +72,7 @@ def chosen_msg(chosen_inline_result):
         num1 = - int(chosen_inline_result.query)
 
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.from_user.username != user_name:
