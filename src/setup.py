@@ -1,9 +1,6 @@
 from setuptools import setup, find_packages
 import main
 
-# The full version, including alpha/beta/rc tags.
-
-# The short X.Y version.
 
 
 setup(

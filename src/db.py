@@ -1,6 +1,7 @@
 import datetime
 import pymongo
 import config
+
 myclient = pymongo.MongoClient(config.dbtoken)
 mydb = myclient["debtsbot"]
 
