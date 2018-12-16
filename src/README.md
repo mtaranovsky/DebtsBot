@@ -15,7 +15,7 @@
 - Щоб розгорнути свій проект на сервері зареєструйтесь на heroku.com і виконайте кроки відповідно до гайду 
 https://devcenter.heroku.com/articles/getting-started-with-python
 
-### Запуск бота за допомогою Dockera
+### Запуск бота за допомогою Docker
 1. docker build -t bot src/
 2. docker run -p 80:80 -v ${pwd}/src/:${pwd}/app/ bot
 
