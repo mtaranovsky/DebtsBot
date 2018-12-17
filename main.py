@@ -1,21 +1,24 @@
-import config
-# import db
 import telebot
 import re
 import os
 from db import MongoManager
+# import config
 
 
 
-bot = telebot.TeleBot(config.token)
+# bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot('648301325:AAGxOUYlDGdzgbqxp_UVhCSD7TNRK07poXk')
+
+
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
-version = re.sub('^v', '', os.popen('git describe').read().strip())
-print(version)
+# version = re.sub('^v', '', os.popen('git describe').read().strip())
+# print(version)
 mongo = MongoManager()
 
-@bot.message_handler(commands=['v'])
-def send_version(message):
-    bot.send_message(message.chat.id, text=version)
+
+# @bot.message_handler(commands=['v'])
+# def send_version(message):
+#     bot.send_message(message.chat.id, text=version)
 
 
 @bot.message_handler(commands=['myWallet'])
@@ -74,7 +77,6 @@ def chosen_msg(chosen_inline_result):
         num1 = - int(chosen_inline_result.query)
 
 
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.from_user.username != user_name:
@@ -93,6 +95,7 @@ def callback_inline(call):
         bot.edit_message_text(inline_message_id=call.inline_message_id,
                               text='Ви не можете прийняти свій же запит',
                               reply_markup=keyboard)
+
 
 # @bot.inline_handler(func=lambda query: len(query.query) is 0)
 # def query_empty(inline_query):

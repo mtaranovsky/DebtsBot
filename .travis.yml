@@ -6,19 +6,26 @@ python:
  
   - "3.6"
 
+services:
+  - docker
+
+
 # command to install dependencies
 install:
 #  - pip install -r requirements.txt
   - docker pull mongo
   - pip install pylint
-  - docker build -t bot src/
+  - pip install mongomock
+  - pip install pymongo
+  - docker build -t bot .
   - docker run -d --rm -p 27017:27017 --name mongodb mongo
-  - docker run -p 80:80 -v ${pwd}/src/:${pwd}/app/ --link mongo --name bot bot
+#  - docker run -p 80:80 -v ${pwd}/src/:${pwd}/app/ --link mongodb --name bot bot
+#  - docker run -p 80:80 --link mongodb --name bot bot
 
 # command to run tests
 script:
- - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then python -m unittest discover; fi
- - pylint db.py
+ - python -m unittest discover
+# - pylint db.py
 
 branches:
   only:

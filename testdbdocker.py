@@ -1,11 +1,13 @@
 import pymongo
 import unittest
 import datetime
-import config
+# import config
 
 from db import MongoManager
 
-myclient = pymongo.MongoClient(config.testdbtoken)
+# myclient = pymongo.MongoClient(config.testdbtoken)
+myclient = pymongo.MongoClient('mongodb://localhost:27017')
+
 mydb = myclient["debtsbot"]
 mycol = mydb["Users"]
 

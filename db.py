@@ -1,8 +1,11 @@
 import datetime
 import pymongo
-import config
+# import config
 
-myclient = pymongo.MongoClient(config.dbtoken)
+# myclient = pymongo.MongoClient(config.dbtoken)
+myclient = pymongo.MongoClient('mongodb://mtaranovsky:963852741t@ds125693.mlab.com:25693/debtsbot')
+
+
 mydb = myclient["debtsbot"]
 
 mycol = mydb["Users"]
