@@ -3,10 +3,10 @@ import os
 import logging
 import telebot
 from db import MongoManager
-import config
+# import config
 
 
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot('648301325:AAGxOUYlDGdzgbqxp_UVhCSD7TNRK07poXk')
 
 
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)

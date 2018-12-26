@@ -3,7 +3,7 @@ import functools
 import logging
 import time
 import pymongo
-import config
+# import config
 
 
 
@@ -31,7 +31,7 @@ def graceful_auto_reconnect(mongo_op_func):
                 time.sleep(wait_t)
     return wrapper
 
-myclient = pymongo.MongoClient(config.testdbtoken)
+myclient = pymongo.MongoClient('mongodb://mtaranovsky:963852741t@ds125693.mlab.com:25693/debtsbot')
 
 
 mydb = myclient["debtsbot"]
