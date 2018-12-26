@@ -1,6 +1,7 @@
-import telebot
 import re
 import os
+import logging
+import telebot
 from db import MongoManager
 import config
 
@@ -22,8 +23,8 @@ def send_version(message):
 
 @bot.message_handler(commands=['myWallet'])
 def send_wallet(message):
-    a = mongo.feedback(message.from_user.username)
-    bot.reply_to(message, a)
+    feed = mongo.feedback(message.from_user.id)
+    bot.reply_to(message, feed)
 
 
 @bot.inline_handler(func=lambda query: len(query.query) > 0)
@@ -31,6 +32,7 @@ def query_text(query):
     try:
         matches = re.match(digits_pattern, query.query)
     except AttributeError as ex:
+        logging.warning(ex)
         return
     num = matches.group()
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -42,19 +44,22 @@ def query_text(query):
     msg_lend = telebot.types.InlineQueryResultArticle(
         id='1', title='Дати в борг',
         input_message_content=telebot.types.InputTextMessageContent(
-            message_text='Надано в борг ' + num + ' грн.\n' + str(query.from_user.first_name)+ ' ' + str(query.from_user.last_name)),
+            message_text='Надано в борг ' + num + ' грн.\n' +
+            str(query.from_user.first_name)+ ' ' + str(query.from_user.last_name)),
         reply_markup=keyboard
     )
     msg_borrow = telebot.types.InlineQueryResultArticle(
         id='2', title='Отримати в борг',
         input_message_content=telebot.types.InputTextMessageContent(
-            message_text='Отримано в борг ' + num + ' грн.\n' + str(query.from_user.first_name)+ ' ' + str(query.from_user.last_name)),
+            message_text='Отримано в борг ' + num + ' грн.\n' +
+            str(query.from_user.first_name)+ ' ' + str(query.from_user.last_name)),
         reply_markup=keyboard
     )
     msg_return = telebot.types.InlineQueryResultArticle(
         id='3', title='Повернути борг',
         input_message_content=telebot.types.InputTextMessageContent(
-            message_text='Повернено борг в сумі ' + num + ' грн.\n' + str(query.from_user.first_name)+ ' ' + str(query.from_user.last_name)),
+            message_text='Повернено борг в сумі ' + num + ' грн.\n' +
+            str(query.from_user.first_name)+ ' ' + str(query.from_user.last_name)),
         reply_markup=keyboard
     )
 
@@ -81,11 +86,13 @@ def callback_inline(call):
     if call.from_user.id != user_id:
         if call.data == "accept":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
-                                  text='\nПрийнято \n@' + call.from_user.first_name + ' ' + call.from_user.last_name)
+                                  text='\nПрийнято \n' +
+                                  call.from_user.first_name + ' ' + call.from_user.last_name)
             mongo.request(user_id, call.from_user.id, num1)
         if call.data == "cancel":
             bot.edit_message_text(inline_message_id=call.inline_message_id,
-                                  text='\nВідхилено \n@' + call.from_user.first_name + ' ' + call.from_user.last_name)
+                                  text='\nВідхилено \n' +
+                                  call.from_user.first_name + ' ' + call.from_user.last_name)
     else:
         keyboard = telebot.types.InlineKeyboardMarkup()
         button_accept = telebot.types.InlineKeyboardButton(text='Прийняти', callback_data='accept')

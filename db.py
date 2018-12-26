@@ -1,22 +1,33 @@
 import datetime
-import pymongo
-import config
 import functools
 import logging
 import time
+import pymongo
+import config
+
 
 
 MAX_AUTO_RECONNECT_ATTEMPTS = 8
+MAX_TIMEOUT = 120
 
 def graceful_auto_reconnect(mongo_op_func):
     @functools.wraps(mongo_op_func)
     def wrapper(*args, **kwargs):
-        for attempt in range(MAX_AUTO_RECONNECT_ATTEMPTS):
+        attempt = 0
+        # for attempt in range(MAX_AUTO_RECONNECT_ATTEMPTS):
+        while True:
             try:
                 return mongo_op_func(*args, **kwargs)
-            except pymongo.errors.AutoReconnect as e:
-                wait_t = pow(2, attempt) # exponential back off
-                logging.warning("PyMongo auto-reconnecting... %s. Waiting %.1f seconds.", str(e), wait_t)
+            except pymongo.errors.AutoReconnect as err:
+
+                wait_t = pow(2, attempt)        # exponential back off
+                if MAX_AUTO_RECONNECT_ATTEMPTS > attempt and MAX_TIMEOUT > wait_t:
+                    attempt = attempt + 1
+                else:
+                    wait_t = MAX_TIMEOUT
+
+                logging.warning("PyMongo auto-reconnecting... %s. Waiting %.1f seconds.",
+                                str(err), wait_t)
                 time.sleep(wait_t)
     return wrapper
 
@@ -133,6 +144,3 @@ class MongoManager:
             if i["debt"] >= 0:
                 result += i["partner_id"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
         return result
-
-
-
