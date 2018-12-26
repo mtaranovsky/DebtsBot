@@ -16,12 +16,12 @@
 https://devcenter.heroku.com/articles/getting-started-with-python
 
 ### Запуск бота за допомогою системи збірки PyInstaller
-1. Встановити PyInstaller із PyPI:
-pip install pyinstaller
-2. Перейдіть до директорію де міститься програма та запустіть:
-pyinstaller --onefile main.py
-Ця дія згенерує виконавчий файл у піддиректорії dist
-3.Запустити цей файл
+1. Встановити PyInstaller із PyPI: <br/>
+    pip install pyinstaller
+2. Перейдіть до директорію де міститься програма та запустіть:<br/>
+pyinstaller --onefile main.py <br/>
+Ця дія згенерує виконавчий файл у піддиректорії dist <br/>
+3. Запустити цей файл
 
 ### Запуск бота за допомогою Docker
 1. docker build -t bot .
