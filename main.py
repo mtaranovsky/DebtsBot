@@ -11,14 +11,14 @@ bot = telebot.TeleBot('648301325:AAGxOUYlDGdzgbqxp_UVhCSD7TNRK07poXk')
 
 
 digits_pattern = re.compile(r'^[0-9]+$', re.MULTILINE)
-# version = re.sub('^v', '', os.popen('git describe').read().strip())
-# print(version)
+version = re.sub('^v', '', os.popen('git describe').read().strip())
+print(version)
 mongo = MongoManager()
 
 
-# @bot.message_handler(commands=['v'])
-# def send_version(message):
-#     bot.send_message(message.chat.id, text=version)
+@bot.message_handler(commands=['v'])
+def send_version(message):
+    bot.send_message(message.chat.id, text=version)
 
 
 @bot.message_handler(commands=['myWallet'])
