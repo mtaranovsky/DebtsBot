@@ -1,9 +1,26 @@
 import datetime
 import pymongo
-# import config
+import config
+import functools
+import logging
+import time
 
-# myclient = pymongo.MongoClient(config.dbtoken)
-myclient = pymongo.MongoClient('mongodb://mtaranovsky:963852741t@ds125693.mlab.com:25693/debtsbot')
+
+MAX_AUTO_RECONNECT_ATTEMPTS = 8
+
+def graceful_auto_reconnect(mongo_op_func):
+    @functools.wraps(mongo_op_func)
+    def wrapper(*args, **kwargs):
+        for attempt in range(MAX_AUTO_RECONNECT_ATTEMPTS):
+            try:
+                return mongo_op_func(*args, **kwargs)
+            except pymongo.errors.AutoReconnect as e:
+                wait_t = pow(2, attempt) # exponential back off
+                logging.warning("PyMongo auto-reconnecting... %s. Waiting %.1f seconds.", str(e), wait_t)
+                time.sleep(wait_t)
+    return wrapper
+
+myclient = pymongo.MongoClient(config.testdbtoken)
 
 
 mydb = myclient["debtsbot"]
@@ -13,123 +30,109 @@ mycol = mydb["Users"]
 
 class MongoManager:
     @classmethod
+    @graceful_auto_reconnect
     def save(cls, record, col):
         col.insert_one(record)
 
     @classmethod
-    def partner_debt_update(cls, username, partner, value, col):
+    @graceful_auto_reconnect
+    def partner_debt_update(cls, user_id, partner_id, value, col):
         col.update_one(
             {
-                'username': username, 'debts.partner': partner
+                'user_id': user_id, 'debts.partner_id': partner_id
             },
             {
                 "$set": {"debts.$.debt": value, 'debts.$.data': datetime.datetime.now()}})
 
     @classmethod
-    def debt_update(cls, username, debt, col):
+    @graceful_auto_reconnect
+    def debt_update(cls, user_id, debt, col):
         col.update_one(
             {
-                'username': username
+                'user_id': user_id
             },
             {
                 "$set": {"debts": debt}})
 
-    def request(self, username, partner, summ):
+    @graceful_auto_reconnect
+    def request(self, user_id, partner_id, summ):
         debts_u = []
         debts_p = []
         sumo_p = 0
         sumo_u = 0
-        dict_user = {"partner": partner, "debt": summ, 'data': datetime.datetime.now()}
-        dict_p = {"partner": username, "debt": summ, 'data': datetime.datetime.now()}
-        users_u = {'username': username, 'debts': debts_u}
-        users_p = {'username': partner, 'debts': debts_p}
-        get_debt_u = mycol.find_one({'username': username, 'debts.partner': partner},
-                                    {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
-        get_debt_p = mycol.find_one({'username': partner, 'debts.partner': username},
-                                    {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+        dict_user = {"partner_id": partner_id, "debt": summ, 'data': datetime.datetime.now()}
+        dict_p = {"partner_id": user_id, "debt": summ, 'data': datetime.datetime.now()}
+        users_u = {'user_id': user_id, 'debts': debts_u}
+        users_p = {'user_id': partner_id, 'debts': debts_p}
+        get_debt_u = mycol.find_one({'user_id': user_id, 'debts.partner_id': partner_id},
+                                    {'_id': 0, 'debts.debt': 1, 'debts.partner_id': 1})
+        get_debt_p = mycol.find_one({'user_id': partner_id, 'debts.partner_id': user_id},
+                                    {'_id': 0, 'debts.debt': 1, 'debts.partner_id': 1})
 
-        if mycol.find_one({'username': username}, {'_id': 0, 'username': 1}) is None:
+        if mycol.find_one({'user_id': user_id}, {'_id': 0, 'user_id': 1}) is None:
             debts_u.append(dict_user)
             debts_p.append(dict_p)
-            # mycol.insert_one(users_u)
             self.save(users_u, mycol)
-            if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) is None:
-                # mycol.insert_one(users_p)
+            if mycol.find_one({'user_id': partner_id}, {'_id': 0, 'user_id': 1}) is None:
                 self.save(users_p, mycol)
             else:
-                array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
+                array = dict(mycol.find_one({'user_id': partner_id}, {'_id': 0, 'debts': 1}))
 
                 asd1 = array['debts']
                 asd1.append(dict_p)
-                self.debt_update(partner, asd1, mycol)
-                # mycol.update_one(
-                #     {
-                #         'username': partner
-                #     },
-                #     {
-                #         "$set": {"debts": asd1}})
-
+                self.debt_update(partner_id, asd1, mycol)
         elif get_debt_u is None:
-            array = dict(mycol.find_one({'username': username}, {'_id': 0, 'debts': 1}))
+            array = dict(mycol.find_one({'user_id': user_id}, {'_id': 0, 'debts': 1}))
             asd = array['debts']
             asd.append(dict_user)
             mycol.update_one(
                 {
-                    'username': username
+                    'user_id': user_id
                 },
                 {
                     "$set": {"debts": asd}})
-            if mycol.find_one({'username': partner}, {'_id': 0, 'username': 1}) is None:
+            if mycol.find_one({'user_id': partner_id}, {'_id': 0, 'user_id': 1}) is None:
                 debts_p.append(dict_p)
-                # y = mycol.insert_one(users_p)
                 self.save(users_p, mycol)
             else:
-                array = dict(mycol.find_one({'username': partner}, {'_id': 0, 'debts': 1}))
+                array = dict(mycol.find_one({'user_id': partner_id}, {'_id': 0, 'debts': 1}))
 
                 asd1 = array['debts']
                 asd1.append(dict_p)
                 mycol.update_one(
                     {
-                        'username': partner
+                        'user_id': partner_id
                     },
                     {
                         "$set": {"debts": asd1}})
 
         else:
             for i in dict(get_debt_u)['debts']:
-                if i['partner'] == partner:
+                if i['partner_id'] == partner_id:
                     sumo_u = i['debt']
 
             for i in dict(get_debt_p)['debts']:
-                if i['partner'] == username:
+                if i['partner_id'] == user_id:
                     sumo_p = i['debt']
 
-        # mycol.update_one(
-        #     {
-        #         'username': username, 'debts.partner': partner
-        #     },
-        #     {
-        #         "$set": {"debts.$.debt": sumo_u + sum, 'debts.$.data': datetime.datetime.now()}})
-        self.partner_debt_update(username, partner, sumo_u + summ, mycol)
-        self.partner_debt_update(partner, username, sumo_p - summ, mycol)
-        # mycol.update_one(
-        #     {
-        #         'username': partner, 'debts.partner': username
-        #     },
-        #     {
-        #         "$set": {"debts.$.debt": sumoP - sum, 'debts.$.data': datetime.datetime.now()}})
-        #
+        self.partner_debt_update(user_id, partner_id, sumo_u + summ, mycol)
+        self.partner_debt_update(partner_id, user_id, sumo_p - summ, mycol)
+
         for row in mycol.find():
             print(row)
 
     @classmethod
-    def feedback(cls, username):
-        get_debt = mycol.find_one({'username': username},
-                                  {'_id': 0, 'debts.debt': 1, 'debts.partner': 1})
+    @graceful_auto_reconnect
+    def feedback(cls, user_id):
+        get_debt = mycol.find_one({'user_id': user_id},
+                                  {'_id': 0, 'debts.debt': 1, 'debts.partner_id': 1})
         result = "Твій фінансовий журнал: \n"
         for i in dict(get_debt)['debts']:
             if i["debt"] < 0:
-                result += "Ти заборгував "+i["partner"]+" "+str(-i["debt"])+"грн.\n"
+                result += "Ти заборгував "+i["partner_id"]+" "+str(-i["debt"])+"грн.\n"
             if i["debt"] >= 0:
-                result += i["partner"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
+                result += i["partner_id"]+" заборгував тобі"+" "+str(i["debt"])+"грн.\n"
         return result
+
+
+

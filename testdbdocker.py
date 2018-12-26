@@ -1,12 +1,12 @@
 import pymongo
 import unittest
 import datetime
-# import config
+import config
 
 from db import MongoManager
 
-# myclient = pymongo.MongoClient(config.testdbtoken)
-myclient = pymongo.MongoClient('mongodb://localhost:27017')
+myclient = pymongo.MongoClient(config.testdbtoken)
+
 
 mydb = myclient["debtsbot"]
 mycol = mydb["Users"]
@@ -22,27 +22,27 @@ class TestStuff(unittest.TestCase):
 
     def test_partner_debt_update(self):
         debtsTest = []
-        mydictTest = {"partner": "B", "debt": 10, 'data': datetime.datetime.now()}
+        mydictTest = {"partner_id": "B", "debt": 10, 'data': datetime.datetime.now()}
         debtsTest.append(mydictTest)
-        usersTest = {'username': "A", 'debts': debtsTest}
+        usersTest = {'user_id': "A", 'debts': debtsTest}
         mycol.insert_one(usersTest)
         mongo = TestMongoManager()
         mongo.partner_debt_update("A", "B", 20, mongo.db_conn)
-        result=mycol.find_one({'username': "A"},{'_id': 0,"username":1,"debts.partner":1,"debts.debt":1})
+        result=mycol.find_one({'user_id': "A"},{'_id': 0,"user_id":1,"debts.partner_id":1,"debts.debt":1})
         print(result)
-        self.assertDictEqual(result, {'username': 'A', 'debts': [{'partner': 'B', 'debt': 20}]})
+        self.assertDictEqual(result, {'user_id': 'A', 'debts': [{'partner_id': 'B', 'debt': 20}]})
 
     def test_debt_update(self):
         debtsTest = []
-        mydictTest = {"partner": "B", "debt": 10, 'data': datetime.datetime.now()}
+        mydictTest = {"partner_id": "B", "debt": 10, 'data': datetime.datetime.now()}
         debtsTest.append(mydictTest)
-        usersTest = {'username': "A", 'debts': []}
+        usersTest = {'user_id': "A", 'debts': []}
         mycol.insert_one(usersTest)
         mongo = TestMongoManager()
         mongo.debt_update("A", debtsTest, mongo.db_conn)
-        result = mycol.find_one({'username': "A"},
-                                          {'_id': 0, "username": 1, "debts.partner": 1, "debts.debt": 1})
-        self.assertDictEqual(result, {'username': 'A', 'debts': [{'partner': 'B', 'debt': 10}]})
+        result = mycol.find_one({'user_id': "A"},
+                                          {'_id': 0, "user_id": 1, "debts.partner_id": 1, "debts.debt": 1})
+        self.assertDictEqual(result, {'user_id': 'A', 'debts': [{'partner_id': 'B', 'debt': 10}]})
 
     def test_save(self):
         mongo = TestMongoManager()
