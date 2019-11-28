@@ -54,7 +54,7 @@ class MongoManager:
             },
             {
                 "$set": {"debts.$.debt": value, 'debts.$.data': datetime.datetime.now()}})
-#
+
     @classmethod
     @graceful_auto_reconnect
     def debt_update(cls, user_id, debt, col):
