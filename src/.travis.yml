@@ -8,7 +8,7 @@ python:
 
 # command to install dependencies
 install:
-#  - pip install -r requirements.txt
+#  - pip install-r requirements.txt
   - docker pull mongo
   - pip install pylint
   - docker build -t bot src/
